@@ -1,6 +1,6 @@
 # AeroChain Authentication (NS‑3 3.36.1)
 
-> **TL;DR** — Two‑way HMAC‑SHA256 authentication for UAV (drone) Wi‑Fi networks simulated in **ns‑3** with a **permissioned blockchain** used for consensus/state distribution. KPIs (throughput, delay) are collected with FlowMonitor and persisted to **SQLite**. The thesis implementation lives in **`scratch/`**.
+Two‑way HMAC based authentication for UAV networks simulated in ns‑3 with a permissioned blockchain used for consensus/state distribution. KPIs (throughput, delay) are collected with FlowMonitor and persisted to SQLite. The code implementation lives in `scratch/`.
 
 ---
 
