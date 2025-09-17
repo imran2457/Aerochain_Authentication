@@ -11,12 +11,12 @@ Two‑way HMAC based authentication for UAV networks simulated in ns‑3 with a 
 - [Quick Start](#quick-start)
 - [Running Experiments](#running-experiments)
 - [Outputs & Data](#outputs--data)
-- [Deep Dive — Authentication](#deep-dive--authentication)
+- [Deep Dive — Authentication](#authentication)
   - [Handshake](#handshake)
   - [Message to MAC (canonical form)](#message-to-mac-canonical-form)
   - [Replay & Freshness](#replay--freshness)
   - [Key Rotation](#key-rotation)
-- [Deep Dive — Revocation](#deep-dive--revocation)
+- [Deep Dive — Revocation](#revocation)
   - [Objectives](#objectives)
   - [Mechanisms](#mechanisms)
   - [Allow/Deny Decision](#allowdeny-decision)
@@ -218,35 +218,12 @@ def is_revoked(node_id: int) -> bool:
 - Chain: simplified PoW with majority agreement; state stored per node as `blockchain_*.csv`.
 - Coupling to network: UDP payload size equals current blockchain CSV byte size (security–performance interplay).
 - Topology:  Wi‑Fi AP + N stations (UAVs).
-- Mobility: 3D Gauss‑Markov in a bounded box (see config below).
+- Mobility: 3D Gauss‑Markov in a bounded box (see config).
 - Routing: OLSR (enabled via ns‑3 module imports in the Python stack).
 
 ---
 
 ## SQLite Schema
-```
-BlockChainData(
-  DataRate,
-  NumberOfNodes,
-  NumberOfTransactions,
-  TotalThroughput,
-  AvgDelay,
-  CurrentTime
-)
-
-NetworkData(
-  NumberOfNodes,
-  NumberOfTransactions,
-  PacketSize,
-  TotalThroughput,
-  AvgThroughput,
-  TotalDelay,
-  AvgDelay,
-  Area,
-  Height,
-  DateTime
-)
-```
 > Configure the DB path in `store_data_in_db.py` (default uses an absolute path under `scratch/throughput_delay_data.db`).
 
 ---
