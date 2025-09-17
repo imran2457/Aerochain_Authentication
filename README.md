@@ -1,6 +1,6 @@
 # Aerochain Authentication (NS-3 3.36.1)
 
-Two way-authenticated UAV networking with ns-3 (Python bindings) and a lightweight blockchain for consensus. Measures low-latency KPIs (throughput, delay) and persists results to SQLite. Packet size is coupled to blockchain CSV size to study security network interactions.
+AeroChain is a blockchain-enabled, two-way authentication framework for UAV communication networks. It introduces a secure alternative to centralized authentication, ensuring that UAVs can reliably verify each other while maintaining high network performance. Two way-authenticated UAV networking with ns-3 (Python bindings) and a permissioned blockchain for consensus. Measures low-latency KPIs (throughput, delay) and persists results to SQLite. Packet size is coupled to blockchain CSV size to study security network interactions.
 
 ## Features
 - HMAC based SHA256 mutual auth (nonces + timestamp)
