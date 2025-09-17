@@ -31,16 +31,16 @@ Two‑way HMAC based authentication for UAV networks simulated in ns‑3 with a 
 ---
 
 ## Overview
-**AeroChain** is a blockchain‑enabled, **two‑way (mutual) authentication** framework for UAV communication networks. The simulation instantiates **1 Wi‑Fi AP** and **N UAV stations** with 3D Gauss‑Markov mobility. A simplified **permissioned blockchain** (PoW + majority check) distributes state (e.g., revocations). To study the coupling of security and performance, **UDP packet size** is tied to the current **blockchain CSV** byte size. KPIs are written to **SQLite**; traces (ASCII/PCAP/NetAnim XML) are optional outputs.
+AeroChain is a blockchain‑enabled, two‑way (mutual) authentication framework for UAV communication networks. The simulation instantiates Wi‑Fi AP and N UAV nodes with 3D Gauss‑Markov mobility. A simplified permissioned blockchain distributes state (e.g., revocations). To study the coupling of security and performance, UDP packet size is tied to the current blockchain CSV byte size. KPIs are written to SQLite; traces (PCAP/NetAnim XML) are optional outputs.
 
 ---
 
 ## Repository Layout
-> Main thesis code is under **`scratch/`**.
+> Main repo code is under `scratch/`.
 
 ```
 Aerochain_Authentication/
-├── scratch/                    # ← Thesis implementation (Python + ns-3 bindings)
+├── scratch/                    # ← Framework implementation (Python + ns-3 bindings)
 │   ├── Network-FinalVersion.py # Orchestrates ns-3 sim, blockchain & DB I/O
 │   ├── blockchain.py           # Block/chain data model, mining, consensus
 │   ├── ChainClass.py           # Chain helpers (if split from blockchain.py)
@@ -53,16 +53,16 @@ Aerochain_Authentication/
 └── test/, examples/, utils/    # Ancillary code
 ```
 
-> **Note**: Some paths in scripts use **absolute Linux paths**. Adjust to your environment/WSL.
+Note: Some paths in scripts use absolute Linux paths. Adjust to your environment/WSL.
 
 ---
 
 ## Prerequisites
-- **OS**: Ubuntu (or WSL2 Ubuntu)
-- **Python**: 3.8+
-- **ns‑3**: v**3.36.1** with **Python bindings** enabled
-- **Python libs**: `pandas`, `sqlite3` (stdlib), plus any listed in `scratch/requirements.txt` (if present)
-- **Optional**: NetAnim for visualizing `*.xml`
+- OS: Ubuntu 18.04.6 LTS or above
+- Python: 3.8+
+- ns‑3: v 3.36.1 with Python bindings enabled
+- Python libs: `pandas`, `sqlite3` (stdlib), plus any listed in `scratch/requirements.txt` (if present)
+- Optional: NetAnim for visualizing `.xml`
 
 ### Build ns‑3 with Python bindings
 ```bash
@@ -81,48 +81,48 @@ $ cd scratch
 $ python3 Network-FinalVersion.py
 ```
 You’ll be prompted for:
-- **Number of nodes (N)** — recommended ≤ 100
-- **Number of transactions** — for blockchain CSV growth
-- **Wi‑Fi data rate** — one of `OfdmRate{6,9,12,18,24,36,48,54}Mbps`
+- Number of nodes (N) — recommended ≤ 100
+- Number of transactions — for blockchain CSV growth
+- Wi‑Fi data rate — one of `OfdmRate{6,9,12,18,24,36,48,54}Mbps`
 
 **Interactive flow**
-- Prints (and stores) a **secret key** in `scratch/SecretKey/secret_key.txt`.
+- Prints (and stores) a secret key in `scratch/SecretKey/secret_key.txt`.
 - Runs the sim and writes logs under `Log_<timestamp>_<runId>/`.
-- Optionally **add a node** (mutual auth required) and re‑run.
-- On exit, moves `*.pcap/*.tr/*.xml` to `NetworkData/`.
+- Optionally add a node (mutual auth required) and re‑run.
+- On exit, moves `.pcap/.tr/.xml` to `NetworkData/`.
 
 ---
 
 ## Running Experiments
 Examples:
 ```bash
-# 5 nodes, 50 transactions, 24 Mbps
+# No of nodes, No of transactions, data rate (e.g.5 nodes, 50 transactions, 24 Mbps) 
 $ python3 Network-FinalVersion.py
 # (enter) 5   50   24
 
 # Add a node when prompted → type the secret from SecretKey/secret_key.txt
 ```
 Key parameters (editable in `Network-FinalVersion.py`):
-- **Region bounds**: `X=[100,200], Y=[100,200], Z=[100,200]` → Area & Height used in stats
-- **Mobility**: 3D **Gauss‑Markov** (`Alpha=0.85`, `TimeStep=0.5s`)
-- **UDP**: `MaxPackets=100`, `Interval=0.1s`, `PacketSize = sizeof(blockchain_*.csv)`
-- **Sim time**: ~100 s (adjust as needed)
+- Region bounds: `X=[100,200], Y=[100,200], Z=[100,200]` → Area & Height used in stats(as example)
+- Mobility: 3D Gauss‑Markov (`Alpha=0.85`, `TimeStep=0.5s`)
+- UDP: `MaxPackets=100`, `Interval=0.1s`, `PacketSize = sizeof(blockchain_*.csv)`
+- Sim time: ~100 s (adjust as needed)
 
 ---
 
 ## Outputs & Data
-- **Per‑run folder**: `Log_<ts>_<runId>/`
+- Per‑run folder: `Log_<ts>_<runId>/`
   - `blockchain_*.csv` — local chain snapshots
   - `node_*.log` — UAV/AP logs
   - NetAnim/ASCII/PCAP traces
   - `SecretKey/secret_key.txt` — current shared secret (for dev/testing only)
-- **SQLite** (file path configured in `store_data_in_db.py`):
+- SQLite (file path configured in `store_data_in_db.py`):
   - Tables: `BlockChainData`, `NetworkData` (see schema below)
 
 ---
 
-## Deep Dive — Authentication
-AeroChain uses **mutual HMAC‑SHA256** with **nonces + timestamps** and a **pre‑shared 256‑bit key**. The AP (auth server) and UAV both prove possession of the same key.
+## Authentication
+AeroChain uses mutual HMAC‑SHA256 with nonces + timestamps and a pre‑shared 256‑bit key. The AP (auth server) and UAV both prove possession of the same key.
 
 ### Handshake
 ```
@@ -136,50 +136,50 @@ Client (UAV_i)                                  AP (Auth Server)
 4)                <-  AUTH_OK: H_s = HMAC_k(id_i || nonce_s || nonce_c || ts_s || ts_c)
 Client verifies H_s → **mutual** auth complete.
 ```
-**Notes**
-- `k` is the **pre‑shared key** read from `SecretKey/secret_key.txt`.
+Notes:
+- `k` is the pre‑shared key read from `SecretKey/secret_key.txt`.
 - Nonces are uniformly random; timestamps use system time.
 - Failure → connection denied; no data plane traffic started for that node.
 
 ### Message to MAC (canonical form)
-To avoid ambiguity, fields are **serialized in a fixed order** and delimited (e.g., `"id|nonceC|nonceS|tsC|tsS"`), then **UTF‑8 encoded** before HMAC.
+To avoid ambiguity, fields are 'serialized in a fixed order' and delimited (e.g., `"id|nonceC|nonceS|tsC|tsS"`), then 'UTF‑8 encoded' before HMAC.
 
 ### Replay & Freshness
-- **Nonces** guarantee uniqueness per session; both sides track **seen nonces**.
-- **Timestamps** are accepted within a small **clock‑skew window** (e.g., ±30s, configurable).
+- Nonces guarantee uniqueness per session; both sides track seen nonces.
+- Timestamps are accepted within a small clock‑skew window (e.g., ±30s, configurable).
 - On duplicate `(id, nonce)` or an out‑of‑window timestamp → reject.
 
 ### Key Rotation
 - Regenerate `SecretKey/secret_key.txt` to rotate keys.
-- All **non‑revoked** nodes must be updated to the new key (see Revocation below for revoked nodes during rotation).
+- All non‑revoked nodes must be updated to the new key (see Revocation below for revoked nodes during rotation).
 
 ---
 
-## Deep Dive — Revocation
-Revocation removes a node’s ability to authenticate and **propagates** that decision across the network.
+##  Revocation
+Revocation removes a node’s ability to authenticate and propagates that decision across the network.
 
 ### Objectives
-1. **Immediate effect** — New handshakes from a revoked ID are rejected.
-2. **Consistent distribution** — All nodes converge on the same revoked set.
-3. **Auditability** — The **blockchain CSV** records revocation events.
+1. Immediate effect — New handshakes from a revoked ID are rejected.
+2. Consistent distribution — All nodes converge on the same revoked set.
+3. Auditability — The blockchain CSV records revocation events.
 
 ### Mechanisms
 AeroChain implements revocation with two complementary layers:
 
-1. **Local blacklist (fast path)**
-   - `HmacAuthentication` checks an in‑memory **revoked set** before verifying HMACs.
-   - Source of truth is a **revocation list** (e.g., `revoked_nodes` structure or file) loaded at startup.
+1. Local blacklist (fast path)
+   - `HmacAuthentication` checks an in‑memory revoked set before verifying HMACs.
+   - Source of truth is a revocation list (e.g., `revoked_nodes` structure or file) loaded at startup.
 
-2. **On‑chain revocation events (consensus path)**
+2. On‑chain revocation events (consensus path)
    - A special transaction type, e.g., `RevokeNode` with fields:
      ```
      { type: "revoke", node_id, reason, timestamp, prev_key_hash }
      ```
    - Appended to the local chain (`blockchain_*.csv`) and shared.
-   - **PoW + majority check** ensures the event is retained by honest nodes.
-   - On ingest, each node updates its local **revoked set**.
+   - Consensus ensures the event is retained by honest nodes.
+   - On ingest, each node updates its local revoked set.
 
-> **Why two layers?** The blacklist blocks immediately; the chain gives a durable, auditable record that propagates to all nodes.
+> Why two layers? The blacklist blocks immediately; the chain gives a durable, auditable record that propagates to all nodes.
 
 ### Allow/Deny Decision
 ```
@@ -191,12 +191,12 @@ function is_allowed(node_id, msg):
 ```
 
 ### How to Simulate a Revocation
-> If the helper APIs aren’t exposed as a CLI yet, use one of these approaches to reproduce the thesis results.
+> If the helper APIs aren’t exposed as a CLI yet, use one of these approaches to reproduce the results.
 
-**A) Blacklist via file (simple & explicit)**
+A) Blacklist via file (simple & explicit)
 1. Create `scratch/revoked_nodes.txt` with one node ID per line, e.g., `7`.
 2. In `HmacAuthentication.py`, load the file once at startup and populate `revoked_set`.
-3. Re‑run `Network-FinalVersion.py`; UAV **7** will fail handshake.
+3. Re‑run `Network-FinalVersion.py`;new UAV will fail handshake.
 
 ```python
 # HmacAuthentication.py (minimal example)
@@ -215,11 +215,11 @@ def is_revoked(node_id: int) -> bool:
 ---
 
 ## Blockchain & Networking Model
-- **Chain**: simplified PoW with majority agreement; state stored per node as `blockchain_*.csv`.
-- **Coupling to network**: **UDP payload size** equals current blockchain CSV byte size (security–performance interplay).
-- **Topology**: 1 **Wi‑Fi AP** + **N stations (UAVs)**.
-- **Mobility**: 3D **Gauss‑Markov** in a bounded box (see config below).
-- **Routing**: OLSR (enabled via ns‑3 module imports in the Python stack).
+- Chain: simplified PoW with majority agreement; state stored per node as `blockchain_*.csv`.
+- Coupling to network: UDP payload size equals current blockchain CSV byte size (security–performance interplay).
+- Topology:  Wi‑Fi AP + N stations (UAVs).
+- Mobility: 3D Gauss‑Markov in a bounded box (see config below).
+- Routing: OLSR (enabled via ns‑3 module imports in the Python stack).
 
 ---
 
@@ -252,37 +252,35 @@ NetworkData(
 ---
 
 ## Configuration Knobs
-- **Wi‑Fi data mode**: `OfdmRate{6..54}Mbps`
-- **Mobility**: `Alpha=0.85`, `TimeStep=0.5s`, box bounds via X/Y/Z ranges
-- **UDP**: packet interval/size as noted above
-- **Paths**: source/target dirs for moving traces; edit in `Network-FinalVersion.py` & `utils.py`
+- Wi‑Fi data mode: `OfdmRate{6..54}Mbps`
+- Mobility: `Alpha=0.85`, `TimeStep=0.5s`, box bounds via X/Y/Z ranges
+- UDP: packet interval/size as noted above
+- Paths: source/target dirs for moving traces; edit in `Network-FinalVersion.py` & `utils.py`
 
 ---
 
 ## Troubleshooting
-- **ImportError: cannot import ns.core** → Recheck `PYTHONPATH` points to ns‑3 Python bindings.
-- **Absolute path crashes** → Search for hard‑coded `/home/<user>/...` in `store_data_in_db.py` and `utils.py` and update.
-- **No nodes added when prompted** → Ensure the **exact** secret from `SecretKey/secret_key.txt` is pasted; rotate the key and retry.
-- **Packet size is zero** → Ensure at least one transaction is written so the blockchain CSV has bytes.
-- **Clock skew rejects auth** → Widen the skew window during testing.
+- ImportError: cannot import ns.core → Recheck `PYTHONPATH` points to ns‑3 Python bindings.
+- Absolute path crashes → Search for hard‑coded `/home/<user>/...` in `store_data_in_db.py` and `utils.py` and update.
+- No nodes added when prompted → Ensure the exact secret from `SecretKey/secret_key.txt` is pasted; rotate the key and retry.
+- Packet size is zero → Ensure at least one transaction is written so the blockchain CSV has bytes.
+- Clock skew rejects auth → Widen the skew window during testing.
 
 ---
 
 ## Limitations
-- The blockchain and revocation models are **research prototypes**, not production security.
-- Single shared secret for demonstration; real deployments should use per‑node keys and a proper key distribution scheme.
+- The blockchain and revocation models are research prototypes.
 - PoW/majority logic is simplified and not resilient to powerful adversaries.
 
 ---
 
 ## Cite / Acknowledgements
-If you use this code or build on the ideas, please cite the associated thesis/paper (add BibTeX here). Thanks to the ns‑3 community and the authors of the Python bindings and FlowMonitor.
+If you use this code or build on the ideas, please cite the associated link. Thanks to the ns‑3 community and the authors of the Python bindings and FlowMonitor.
 
 ---
 
 ### Maintainers
 - @imran2457
 
-### License
-Add your license here (e.g., MIT/Apache‑2.0).
+
 
