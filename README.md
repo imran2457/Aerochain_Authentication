@@ -1,14 +1,14 @@
 # Aerochain Authentication (NS-3 3.36.1)
 
-2 way-authenticated UAV networking with ns-3 (Python bindings) and a lightweight blockchain for logging/consensus. Measures low-latency KPIs (throughput, delay) and persists results to SQLite. Packet size is coupled to blockchain CSV size to study security network interactions.
+Two way-authenticated UAV networking with ns-3 (Python bindings) and a lightweight blockchain for consensus. Measures low-latency KPIs (throughput, delay) and persists results to SQLite. Packet size is coupled to blockchain CSV size to study security network interactions.
 
 ## Features
-- HMAC-SHA256 mutual auth (nonces + timestamp)
+- HMAC based SHA256 mutual auth (nonces + timestamp)
 - Wi-Fi AP + N STAs, OfdmRate{6..54} Mbps
-- 3D Gauss�Markov mobility (bounded box)
+- 3D Gauss Markov mobility (bounded box)
 - FlowMonitor KPIs: total/avg throughput and delay
 - NetAnim + ASCII/PCAP traces
-- Blockchain: toy PoW + majority check; CSV state per node
+- Blockchain: PoW + majority check; CSV state per node
 - SQLite tables: BlockChainData, NetworkData
 
 ## Files
