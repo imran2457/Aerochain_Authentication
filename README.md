@@ -12,11 +12,11 @@ Two way-authenticated UAV networking with ns-3 (Python bindings) and a lightweig
 - SQLite tables: BlockChainData, NetworkData
 
 ## Files
-- `Network-FinalVersion.py` � Orchestrates blockchain, ns-3 sim, DB writes
-- `blockchain.py` / `ChainClass.py` � Chain data model, mining, consensus
-- `HmacAuthentication.py` � HMAC mutual auth protocol
-- `utils.py` � Round robin tx assign, run IDs, secret key, file moves
-- `store_data_in_db.py` � SQLite insert helpers
+- `Network-FinalVersion.py` - Orchestrates blockchain, ns-3 sim, DB writes
+- `blockchain.py` / `ChainClass.py` - Chain data model, mining, consensus
+- `HmacAuthentication.py` - HMAC mutual auth protocol
+- `utils.py` - Round robin tx assign, run IDs, secret key, file moves
+- `store_data_in_db.py`  SQLite insert helpers
 
 ## Requirements
 - OS: Linux or Windows via WSL (code uses Linux-style paths)
