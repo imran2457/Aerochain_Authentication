@@ -1,6 +1,6 @@
-# BlockUAV Authentication (NS-3 3.36.1)
+# Aerochain Authentication (NS-3 3.36.1)
 
-HMAC-authenticated UAV networking with ns-3 (Python bindings) and a lightweight blockchain for logging/consensus. Measures low-latency KPIs (throughput, delay) and persists results to SQLite. Packet size is coupled to blockchain CSV size to study security�network interactions.
+2 way-authenticated UAV networking with ns-3 (Python bindings) and a lightweight blockchain for logging/consensus. Measures low-latency KPIs (throughput, delay) and persists results to SQLite. Packet size is coupled to blockchain CSV size to study security network interactions.
 
 ## Features
 - HMAC-SHA256 mutual auth (nonces + timestamp)
