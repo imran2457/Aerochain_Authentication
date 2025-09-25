@@ -139,7 +139,7 @@ Client verifies H_s → **mutual** auth complete.
 Notes:
 - `k` is the pre‑shared key read from `SecretKey/secret_key.txt`.
 - Nonces are uniformly random; timestamps use system time.
-- Failure → connection denied; no data plane traffic started for that node.
+- Failure → connection denied; no data plane traffic started for that node..
 
 ### Message to MAC (canonical form)
 To avoid ambiguity, fields are 'serialized in a fixed order' and delimited (e.g., `"id|nonceC|nonceS|tsC|tsS"`), then 'UTF‑8 encoded' before HMAC.
