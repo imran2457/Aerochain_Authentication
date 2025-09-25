@@ -22,7 +22,6 @@ Two‑way HMAC based authentication for UAV networks simulated in ns‑3 with a 
   - [Allow/Deny Decision](#allowdeny-decision)
   - [How to Simulate a Revocation](#how-to-simulate-a-revocation)
 - [Blockchain & Networking Model](#blockchain--networking-model)
-- [SQLite Schema](#sqlite-schema)
 - [Configuration Knobs](#configuration-knobs)
 - [Troubleshooting](#troubleshooting)
 - [Limitations](#limitations)
@@ -139,7 +138,7 @@ Client verifies H_s → **mutual** auth complete.
 Notes:
 - `k` is the pre‑shared key read from `SecretKey/secret_key.txt`.
 - Nonces are uniformly random; timestamps use system time.
-- Failure → connection denied; no data plane traffic started for that node.
+- Failure → connection denied; no data plane traffic started for that node..
 
 ### Message to MAC (canonical form)
 To avoid ambiguity, fields are 'serialized in a fixed order' and delimited (e.g., `"id|nonceC|nonceS|tsC|tsS"`), then 'UTF‑8 encoded' before HMAC.
@@ -221,10 +220,6 @@ def is_revoked(node_id: int) -> bool:
 - Mobility: 3D Gauss‑Markov in a bounded box (see config).
 - Routing: OLSR (enabled via ns‑3 module imports in the Python stack).
 
----
-
-## SQLite Schema
-> Configure the DB path in `store_data_in_db.py` (default uses an absolute path under `scratch/throughput_delay_data.db`).
 
 ---
 
