@@ -233,7 +233,6 @@ def is_revoked(node_id: int) -> bool:
 
 ## Troubleshooting
 - ImportError: cannot import ns.core → Recheck `PYTHONPATH` points to ns‑3 Python bindings.
-- Absolute path crashes → Search for hard‑coded `/home/<user>/...` in `store_data_in_db.py` and `utils.py` and update.
 - No nodes added when prompted → Ensure the exact secret from `SecretKey/secret_key.txt` is pasted; rotate the key and retry.
 - Packet size is zero → Ensure at least one transaction is written so the blockchain CSV has bytes.
 - Clock skew rejects auth → Widen the skew window during testing.
