@@ -22,7 +22,6 @@ Two‑way HMAC based authentication for UAV networks simulated in ns‑3 with a 
   - [Allow/Deny Decision](#allowdeny-decision)
   - [How to Simulate a Revocation](#how-to-simulate-a-revocation)
 - [Blockchain & Networking Model](#blockchain--networking-model)
-- [SQLite Schema](#sqlite-schema)
 - [Configuration Knobs](#configuration-knobs)
 - [Troubleshooting](#troubleshooting)
 - [Limitations](#limitations)
@@ -221,10 +220,6 @@ def is_revoked(node_id: int) -> bool:
 - Mobility: 3D Gauss‑Markov in a bounded box (see config).
 - Routing: OLSR (enabled via ns‑3 module imports in the Python stack).
 
----
-
-## SQLite Schema
-> Configure the DB path in `store_data_in_db.py` (default uses an absolute path under `scratch/throughput_delay_data.db`).
 
 ---
 
