@@ -1,0 +1,117 @@
+role role_A(A,B: agent,
+            K: symmetric_key,
+            H: hash_func,
+            SND,RCV: channel(dy))
+played_by A
+def=
+    local 
+        State: nat,
+        M, Na, Nb, Nc, Nd, Ne, Nf: text
+    init
+        State := 0
+    transition
+ 1.  State = 0 /\ RCV(start) =|>
+            State' := 1 
+            /\ Na' := new()  %% Generate a fresh nonce Na
+            /\ SND(A.B.{Na'.A.H(Na'.K)}_K)  %% Send Na to B, with A's ID and a keyed hash of Na (HMAC)
+ 2.  State = 1 /\ RCV(B.{Na.Nb.B.H(Na'.K)}_K) =|>
+            State' := 2 
+            /\ Nb' := new()  %% Generate a fresh nonce Nb
+            /\ M' := new()  %% Generate a new message M
+            /\ SND(A.B.{Nb'.M'.H(Na.Nb.M'.K)}_K)  %% Send Nb, message M, and a keyed hash (HMAC) of Na, Nb, and M to B
+            /\ witness(A,B,auth_2,M') %% A is witnessing B for auth_2 over M
+            /\ secret(M',sec_1,{A,B}) %% Declare M as secret to only A and B
+ 3. State = 2 /\ RCV(B.{H(M.K).Nc.H(M.K)}_K) =|>
+            State' := 3
+            /\ Nc' := new()  %% Generate a fresh nonce Nc
+            /\ SND(A.B.{Nc'.H(M.K).H(Nc'.K)}_K) %% Send Nc with H(M,K), and a keyed hash of Nc (HMAC) to B
+            /\ request(A,B,auth_1,Nb)  %% A requests from B for authentication using Nb
+    4.  State = 3 /\ RCV(B.{H(Nc.K).Nd.H(Nc.K)}_K) =|>
+            State' := 4
+            /\ Nd' := new() %% Generate a fresh nonce Nd
+            /\ SND(A.B.{Nd'.H(Nd'.K)}_K)  %% Send Nd and a keyed hash of Nd (HMAC) to B
+
+       5.  State = 4 /\ RCV(B.{H(Nd.K).Ne}_K) =|>
+            State' := 5
+            /\ Ne' := new() %% Generate a fresh nonce Ne
+            /\ SND(A.B.{Ne'.H(Ne'.K)}_K)  %% Send Ne and a keyed hash of Ne (HMAC) to B
+
+       6.  State = 5 /\ RCV(B.{H(Ne.K).Nf}_K) =|>
+            State' := 6
+            /\ Nf' := new() %% Generate a fresh nonce Nf
+            /\ SND(A.B.{Nf'}_K)  %% Send Nf to B
+ 7.  State = 6 /\ RCV(B.{H(Nf.K)}_K) =|>
+            State' := 7 %% Final state of the protocol for A
+end role
+
+role role_B(B,A: agent,
+            K: symmetric_key,
+            H: hash_func,
+            SND,RCV: channel(dy))
+played_by B
+def=
+    local
+        State: nat,
+        M, Na, Nb, Nc, Nd, Ne, Nf: text
+    init
+        State := 0
+    transition
+ 1.  State = 0 /\ RCV(A.B.{Na'.A.H(Na'.K)}_K) =|>
+            State' := 1 
+            /\ Nb' := new()  %% Generate a fresh nonce Nb
+            /\ SND(B.A.{Na'.Nb'.B.H(Na'.K)}_K)  %% Send Na, Nb and B's ID with keyed hash of Na's nonce to A
+            /\ witness(B,A,auth_1,Nb') %% B witnesses A for authentication using Nb
+        
+ 2.  State = 1 /\ RCV(A.B.{Nb.M'.H(Na.Nb.M'.K)}_K) =|>
+            State' := 2
+            /\ Nc' := new()  %% Generate a fresh nonce Nc
+            /\ SND(B.A.{H(M'.K).Nc'.H(M'.K)}_K)  %% Send a keyed hash of M (HMAC), Nc, and another keyed hash to A
+            /\ request(B,A,auth_2,M') %% B request A for authentication using M
+            /\ secret(M',sec_1,{A,B}) %% Declare the message M as secret to A and B
+ 3.  State = 2 /\ RCV(A.B.{Nc.H(M.K).H(Nc.K)}_K) =|>
+            State' := 3
+            /\ Nd' := new() %% Generate a fresh nonce Nd
+            /\ SND(B.A.{H(Nc.K).Nd'.H(Nc.K)}_K) %% Sends Nd with keyed hashes of Nc to A
+
+        4.  State = 3 /\ RCV(A.B.{Nd.H(Nd.K)}_K) =|>
+            State' := 4
+            /\ Ne' := new() %% Generate a fresh nonce Ne
+            /\ SND(B.A.{H(Nd.K).Ne'}_K)  %% Send Ne and a keyed hash of Nd (HMAC) to A
+
+  5.  State = 4 /\ RCV(A.B.{Ne.H(Ne.K)}_K) =|>
+             State' := 5
+             /\ Nf' := new() %% Generate a fresh nonce Nf
+             /\ SND(B.A.{H(Ne.K).Nf'}_K)  %% Send Nf and a keyed hash of Ne (HMAC) to A
+
+        6.  State = 5 /\ RCV(A.B.{Nf}_K) =|>
+            State' := 6
+            /\ SND(B.A.{H(Nf.K)}_K)  %% Send a keyed hash of Nf (HMAC) to A.  Final state for B
+end role
+role session(A,B: agent, K: symmetric_key, H: hash_func)
+def=
+    local SA, RA, SB, RB: channel(dy)
+    composition
+        role_A(A,B,K,H,SA,RA) /\ role_B(B,A,K,H,SB,RB)
+end role
+
+role environment()
+def=
+    const
+        a,b: agent,
+        k: symmetric_key,
+        h: hash_func,
+        auth_1,auth_2,sec_1, sec_2: protocol_id
+
+    intruder_knowledge = {a,b}
+
+    composition
+        session(a,b,k,h) /\ session(a,b,k,h) /\ session(a,b,k,h)
+end role
+goal
+    secrecy_of sec_1   %% The secret M is only known to A and B
+    secrecy_of sec_2   %% Used for demonstration
+    authentication_on auth_1   %% Ensure mutual authentication of Nb
+    authentication_on auth_2   %% Ensure mutual authentication of M
+end goal
+
+environment()
