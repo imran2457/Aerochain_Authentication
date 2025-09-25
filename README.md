@@ -115,8 +115,8 @@ Key parameters (editable in `Network-FinalVersion.py`):
   - `node_*.log` — UAV/AP logs
   - NetAnim/ASCII/PCAP traces
   - `SecretKey/secret_key.txt` — current shared secret (for dev/testing only)
-- SQLite (file path configured in `store_data_in_db.py`):
-  - Tables: `BlockChainData`, `NetworkData` (see schema below)
+- SQLite:
+  - Tables: `BlockChainData`, `NetworkData` (for example)
 
 ---
 
